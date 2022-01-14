@@ -29,7 +29,7 @@ class Generator(nn.Module):
 
     def forward(self, z):
         output = self.model(z)
-        # print(output.shape)
+        print(output.shape)
         return output
 
 class Discriminator(nn.Module):
@@ -38,15 +38,33 @@ class Discriminator(nn.Module):
         self.args = args
 
         self.model = nn.Sequential(
+            nn.Conv2d(3, 32, kernel_size=4, stride=2, padding=1),
+            nn.LeakyReLU(0.2, inplace=True),
+            
+            nn.Conv2d(32, 64, kernel_size=4, stride=2, padding=1),
+            nn.BatchNorm2d(64),
+            nn.LeakyReLU(0.2, inplace=True),
+            
+            nn.Conv2d(64, 128, kernel_size=3, stride=2, padding=1),
+            nn.BatchNorm2d(128),
+            nn.LeakyReLU(0.2, inplace=True),
 
+            nn.Conv2d(128, 1, kernel_size=4, stride=1, padding=0),
+            nn.Sigmoid()
         )
 
+    def forward(self, x):
+        output = self.model(x)
+        output = output.view(-1, 1).squeeze(1)
+        print(output.shape)
+        return output
 
 def main(args):
     g = Generator(args)
     tmp = torch.randn((4, args.latent_dimension)).view(-1, args.latent_dimension, 1, 1)
-
-    g(tmp)
+    g_out = g(tmp)
+    d = Discriminator(args)
+    d_out = d(g_out)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser('Parameters parser', parents=[get_args_parser()])
