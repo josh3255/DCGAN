@@ -3,6 +3,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# test result
+test_output/*
+weights/*
+MNIST_DATASET/*
+
 # C extensions
 *.so
 
